@@ -1165,11 +1165,13 @@ YGL_API yo_scene* yo_load_obj(const char* filename, bool triangulate,
             yo__add_shape(shapes, materials, name, matname, groupname, xform,
                           elem, vert, vhash);
             matname = ym_string((ntok > 1) ? tok[1] : 0);
+#ifndef YO_NOMTLLIB
         } else if (!strcmp(tok[0], "mtllib")) {
             char mfilename[4096];
             yo__split_path(filename, mfilename, 0, 0);
             strcat(mfilename, tok[1]);
             if (!yo__load_mtl(materials, textures, mfilename)) return 0;
+#endif
         } else {
             // TODO: explicit skips
         }
