@@ -1018,7 +1018,6 @@ YGL_API yo_scene* yo_load_obj(const char* filename, bool triangulate,
     ym_vector<yo_env> envs;
 
     // current shape scene
-    yo__vhash* vhash = new yo__vhash();
     ym_string name, matname, groupname;
     ym_affine3f xform = ym_identity_affine3f;
     yo__elemdata elem;
@@ -1027,6 +1026,8 @@ YGL_API yo_scene* yo_load_obj(const char* filename, bool triangulate,
     // start
     FILE* file = fopen(filename, "rt");
     if (!file) return 0;
+
+    yo__vhash* vhash = new yo__vhash();
 
     // foreach line, splits the line by whitespaces and parses the data
     // directly in the current shape, emitting shapes when either name,
@@ -1170,7 +1171,10 @@ YGL_API yo_scene* yo_load_obj(const char* filename, bool triangulate,
             char mfilename[4096];
             yo__split_path(filename, mfilename, 0, 0);
             strcat(mfilename, tok[1]);
-            if (!yo__load_mtl(materials, textures, mfilename)) return 0;
+            if (!yo__load_mtl(materials, textures, mfilename)) {
+                delete vhash;
+                return 0;
+            }
 #endif
         } else {
             // TODO: explicit skips
@@ -1183,6 +1187,8 @@ YGL_API yo_scene* yo_load_obj(const char* filename, bool triangulate,
 
     // close file
     fclose(file);
+
+    delete vhash;
 
     // add data to scene
     scene->shapes = shapes;
